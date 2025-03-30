@@ -7,9 +7,30 @@ import CheckoutStyles from './CheckoutStyles';
  * @param {Object} data - Данные формы
  * @param {Object} errors - Ошибки валидации
  * @param {Function} handleInputChange - Обработчик изменения полей
+ * @param {Function} formatPhoneNumber - Функция форматирования телефонного номера
  */
-export default function CustomerForm({ data, errors, handleInputChange }) {
+export default function CustomerForm({ data, errors, handleInputChange, formatPhoneNumber }) {
     const { INPUT_STYLE } = CheckoutStyles();
+    
+    // Обработчик изменения телефона с использованием функции форматирования из хука
+    const handlePhoneChange = (e) => {
+        const value = e.target.value;
+        
+        // Форматируем номер телефона с помощью функции из хука
+        const formattedPhone = formatPhoneNumber(value);
+        
+        // Обновляем поле с форматированным значением
+        const updatedEvent = {
+            ...e,
+            target: {
+                ...e.target,
+                name: 'customer_phone',
+                value: formattedPhone
+            }
+        };
+        
+        handleInputChange(updatedEvent);
+    };
     
     return (
         <>
@@ -58,10 +79,15 @@ export default function CustomerForm({ data, errors, handleInputChange }) {
                         id="customer_phone"
                         name="customer_phone"
                         value={data.customer_phone}
-                        onChange={handleInputChange}
+                        onChange={handlePhoneChange}
                         className={INPUT_STYLE}
+                        placeholder="+7 (___) ___-__-__"
+                        maxLength={18} // +7 (123) 456-78-90
+                        pattern="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"
+                        title="Формат: +7 (XXX) XXX-XX-XX"
                         required
                     />
+                    <p className="mt-1 text-xs text-gray-500">Формат: +7 (XXX) XXX-XX-XX</p>
                     {errors.customer_phone && (
                         <p className="mt-1 text-xs text-red-500">{errors.customer_phone}</p>
                     )}

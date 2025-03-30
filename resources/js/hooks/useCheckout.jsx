@@ -5,6 +5,51 @@ import { useForm } from '@inertiajs/react';
 import { toast } from 'react-toastify';
 
 /**
+ * Форматирует телефонный номер в стандартный российский формат
+ * 
+ * @param {string} phone - Номер телефона в любом формате
+ * @returns {string} - Форматированный номер телефона
+ */
+function formatPhoneNumber(phone) {
+    if (!phone) return '+7';
+    
+    // Удаляем все символы кроме цифр
+    const digits = phone.replace(/\D/g, '');
+    
+    // Обеспечиваем наличие кода страны
+    const phoneDigits = digits.startsWith('7') ? digits : (digits.startsWith('8') ? '7' + digits.substring(1) : '7' + digits);
+    
+    // Проверяем длину и обрезаем до 11 цифр (российский формат)
+    const trimmedDigits = phoneDigits.substring(0, 11);
+    
+    // Если после удаления нецифровых символов и обрезания осталось мало цифр
+    if (trimmedDigits.length <= 1) {
+        return '+7';
+    }
+    
+    // Форматируем телефон
+    let formattedPhone = '+7';
+    
+    if (trimmedDigits.length > 1) {
+        formattedPhone += ' (' + trimmedDigits.substring(1, Math.min(4, trimmedDigits.length));
+    }
+    
+    if (trimmedDigits.length > 4) {
+        formattedPhone += ') ' + trimmedDigits.substring(4, Math.min(7, trimmedDigits.length));
+    }
+    
+    if (trimmedDigits.length > 7) {
+        formattedPhone += '-' + trimmedDigits.substring(7, Math.min(9, trimmedDigits.length));
+    }
+    
+    if (trimmedDigits.length > 9) {
+        formattedPhone += '-' + trimmedDigits.substring(9, Math.min(11, trimmedDigits.length));
+    }
+    
+    return formattedPhone;
+}
+
+/**
  * Хук для управления состоянием и логикой оформления заказа
  * 
  * @returns {Object} Состояние и методы для работы с оформлением заказа
@@ -28,7 +73,7 @@ export default function useCheckout() {
     const { data, setData, post, processing, errors } = useForm({
         customer_name: user?.name || '',
         customer_email: user?.email || '',
-        customer_phone: user?.phone || '+7',
+        customer_phone: formatPhoneNumber(user?.phone) || '+7',
         delivery_method: 'pickup',
         delivery_address: user?.address || '',
         payment_method: 'card',
@@ -45,7 +90,7 @@ export default function useCheckout() {
                 ...prevData,
                 customer_name: user.name || prevData.customer_name,
                 customer_email: user.email || prevData.customer_email,
-                customer_phone: user.phone || prevData.customer_phone || '+7',
+                customer_phone: formatPhoneNumber(user.phone) || prevData.customer_phone || '+7',
                 delivery_address: user.address || prevData.delivery_address
             }));
         }
@@ -102,6 +147,12 @@ export default function useCheckout() {
     const handleSubmit = (e) => {
         e.preventDefault();
         
+        // Форматируем телефон перед отправкой
+        setData(prevData => ({
+            ...prevData,
+            customer_phone: formatPhoneNumber(prevData.customer_phone)
+        }));
+        
         post(route('account.orders.store'), {
             preserveScroll: true,
             onSuccess: () => {
@@ -127,7 +178,14 @@ export default function useCheckout() {
     // Обработчик изменения полей формы
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setData(data => ({ ...data, [name]: value }));
+        
+        // Если изменяется поле телефона, применяем дополнительную валидацию
+        if (name === 'customer_phone') {
+            // Пусть форматирование происходит в компоненте CustomerForm
+            setData(data => ({ ...data, [name]: value }));
+        } else {
+            setData(data => ({ ...data, [name]: value }));
+        }
     };
 
     // Обработчик повторной загрузки корзины при ошибке
@@ -151,6 +209,7 @@ export default function useCheckout() {
         handleSubmit,
         handleInputChange,
         handleRetryLoading,
-        formatPrice
+        formatPrice,
+        formatPhoneNumber
     };
 } 

@@ -31,7 +31,7 @@ export default function Profile({
 }) {
     const profile = useProfile(initialTab);
     const isMobile = useMediaQuery({ maxWidth: 768 });
-
+    
     return (
         <MainLayout>
             <Head title="Профиль" />

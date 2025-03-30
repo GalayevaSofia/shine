@@ -25,9 +25,10 @@ export default function Checkout() {
         handleSubmit,
         handleInputChange,
         handleRetryLoading,
-        formatPrice
+        formatPrice,
+        formatPhoneNumber
     } = useCheckout();
-
+    
     // Определение состояния страницы
     const getPageContent = () => {
         if (cartLoading) {
@@ -62,6 +63,7 @@ export default function Checkout() {
                 delivery={delivery}
                 total={total}
                 formatPrice={formatPrice}
+                formatPhoneNumber={formatPhoneNumber}
             />
         );
     };

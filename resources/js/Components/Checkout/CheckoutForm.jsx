@@ -21,7 +21,8 @@ export default function CheckoutForm({
     discount,
     delivery,
     total,
-    formatPrice
+    formatPrice,
+    formatPhoneNumber
 }) {
     const { 
         CARD_STYLE
@@ -40,6 +41,7 @@ export default function CheckoutForm({
                                 data={data}
                                 errors={errors}
                                 handleInputChange={handleInputChange}
+                                formatPhoneNumber={formatPhoneNumber}
                             />
                         </div>
 

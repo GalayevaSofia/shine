@@ -28,7 +28,7 @@ class CheckoutController extends Controller
             $request->validate([
                 'customer_name' => 'required|string|max:255',
                 'customer_email' => 'required|email|max:255',
-                'customer_phone' => 'required|string|max:255',
+                'customer_phone' => 'required|string|regex:/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/|max:18',
                 'delivery_method' => 'required|string|in:pickup,courier',
                 'delivery_address' => 'required_if:delivery_method,courier|nullable|string',
                 'payment_method' => 'required|string|in:card,cash',

@@ -130,9 +130,27 @@ export default function useProfile(initialTab = 'profile') {
 			if (data.success) {
 				setWishlistItems(wishlistItems.filter(item => item.product_id !== productId));
 				showNotification('Товар удален из избранного', 'success');
+
+				// Обновляем глобальный кэш избранного
+				if (window.wishlistCache) {
+					window.wishlistCache.set(productId, false);
+				}
 			}
 		} catch (error) {
 			console.error('Error removing item from wishlist:', error);
+
+			// В случае 404 считаем, что удаление все равно произошло
+			if (error.response?.status === 404) {
+				setWishlistItems(wishlistItems.filter(item => item.product_id !== productId));
+				showNotification('Товар удален из избранного', 'success');
+
+				// Обновляем глобальный кэш избранного
+				if (window.wishlistCache) {
+					window.wishlistCache.set(productId, false);
+				}
+				return;
+			}
+
 			showNotification('Ошибка при удалении товара', 'error');
 		}
 	};

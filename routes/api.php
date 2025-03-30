@@ -7,13 +7,11 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 // use App\Http\Controllers\ReviewController; // Commented out as reviews functionality is removed
 use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\PromotionController;
-use App\Http\Controllers\SearchController;
-use App\Http\Controllers\CheckoutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,7 +38,6 @@ Route::get('/products/{id}', [ProductController::class, 'details']);
 Route::get('/products/{id}/related', [ProductController::class, 'related']);
 Route::get('/categories/{slug}/products', [ProductController::class, 'byCategory']);
 // Route::get('/products/{productId}/reviews', [ReviewController::class, 'index']); // Commented out as reviews functionality is removed
-Route::get('/search', [SearchController::class, 'search']);
 
 // Акции (Promotions)
 Route::get('/promotions', [PromotionController::class, 'index']);
@@ -49,8 +46,8 @@ Route::get('/promotions/{slug}', [PromotionController::class, 'show']);
 // Маршрут для проверки аутентификации
 Route::get('/auth/check', function () {
     return response()->json([
-        'authenticated' => auth()->check(),
-        'user' => auth()->check() ? auth()->user() : null
+        'authenticated' => Auth::check(),
+        'user' => Auth::check() ? Auth::user() : null
     ], 200);
 });
 
@@ -61,53 +58,6 @@ Route::middleware(['web'])->group(function () {
     Route::post('/cart/update', [CartController::class, 'updateCartItem'])->withoutMiddleware(['auth:sanctum']);
     Route::post('/cart/remove', [CartController::class, 'removeItem'])->withoutMiddleware(['auth:sanctum']);
     Route::post('/cart/clear', [CartController::class, 'clearCart'])->withoutMiddleware(['auth:sanctum']);
-
-    // Add debug route for testing cart
-    Route::get('/cart/debug', function() {
-        $controller = new \App\Http\Controllers\CartController();
-        $cart = $controller->index();
-        return $cart;
-    });
-
-    // Тестовые маршруты для отладки
-    Route::post('/test/set-discount', [CartController::class, 'testSetDiscount']);
-    
-    // Тестовый маршрут для вывода всех переменных корзины
-    Route::get('/cart/debug-full', function() {
-        $controller = new \App\Http\Controllers\CartController();
-        $result = $controller->index();
-        
-        // Преобразуем ответ в массив
-        $responseData = json_decode($result->getContent(), true);
-        
-        // Получаем корзину и товары
-        $cart = $responseData['cart'] ?? [];
-        $items = $responseData['items'] ?? [];
-        
-        // Добавляем дополнительную отладочную информацию
-        foreach ($items as &$item) {
-            if (isset($item['product'])) {
-                // Выводим все поля продукта
-                \Illuminate\Support\Facades\Log::info('Товар в отладке:', [
-                    'ID' => $item['product']['id'] ?? 'нет',
-                    'Название' => $item['product']['name'] ?? 'нет',
-                    'Цена' => $item['product']['price'] ?? 'нет',
-                    'Лучшая цена' => $item['product']['best_price'] ?? 'нет',
-                    'Оригинальная цена' => $item['product']['original_price'] ?? 'нет',
-                    'Скидка' => $item['product']['discount_percentage'] ?? 'нет',
-                    'Промоакция' => $item['product']['promotion_name'] ?? 'нет'
-                ]);
-            }
-        }
-        
-        return response()->json([
-            'cart' => $cart,
-            'items' => $items,
-            'server_time' => now(),
-            'php_version' => phpversion(),
-            'session_id' => session()->getId()
-        ]);
-    });
 });
 
 // Catalog routes
@@ -133,31 +83,6 @@ Route::middleware(['auth:sanctum', 'web'])->group(function () {
     Route::delete('/wishlist/{productId}', [WishlistController::class, 'destroy']);
     Route::get('/wishlist/check/{productId}', [WishlistController::class, 'check']);
     Route::get('/wishlist/check-batch', [WishlistController::class, 'checkBatch']);
-
-    Route::get('/auth/check', function () {
-        return response()->json(['authenticated' => true]);
-    });
 });
 
-// Admin routes
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-    // Categories
-    Route::apiResource('categories', CategoryController::class);
-
-    // Products
-    Route::apiResource('products', ProductController::class);
-
-    // Orders
-    Route::get('/orders', [OrderController::class, 'adminIndex']);
-    Route::get('/orders/{id}', [OrderController::class, 'adminShow']);
-    Route::put('/orders/{id}', [OrderController::class, 'adminUpdate']);
-
-    // Reviews - commented out as reviews functionality is removed
-    // Route::get('/reviews', [ReviewController::class, 'adminIndex']);
-    // Route::put('/reviews/{reviewId}/status', [ReviewController::class, 'adminUpdateStatus']);
-});
-
-// Add a debug route for product listing
-Route::get('/products/debug', function() {
-    return \App\Models\Product::with('category')->limit(5)->get();
-});
+// Удалена группа маршрутов для админ-панели, так как функционал не будет реализован

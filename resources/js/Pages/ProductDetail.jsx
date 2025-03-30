@@ -11,7 +11,7 @@ import ProductNotifications from '@/Components/Product/ProductNotifications';
 import useProductDetail from '@/hooks/useProductDetail';
 
 export default function ProductDetail({ product, relatedProducts, error }) {
-    const { 
+    const {
         quantity, 
         setQuantity, 
         isAddingToCart, 
@@ -59,15 +59,15 @@ export default function ProductDetail({ product, relatedProducts, error }) {
                     {/* Product Info Section */}
                     <div className="flex-1">
                         <ProductHeader product={product} />
-                        
-                        <div className="mb-6">
-                            <PromotionPrice product={product} size="large" />
-                        </div>
 
-                        <div className="mb-6 space-y-4">
+                            <div className="mb-6">
+                            <PromotionPrice product={product} size="large" />
+                            </div>
+
+                            <div className="mb-6 space-y-4">
                             <AddToCartSection 
                                 product={product}
-                                quantity={quantity}
+                                                quantity={quantity}
                                 setQuantity={setQuantity}
                                 isAddingToCart={isAddingToCart}
                                 handleAddToCart={handleAddToCart}

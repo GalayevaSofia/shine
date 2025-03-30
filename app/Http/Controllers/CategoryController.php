@@ -13,18 +13,6 @@ use Illuminate\Support\Facades\Log;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the categories.
-     */
-    public function index()
-    {
-        $categories = Category::with('children')->whereNull('parent_id')->get();
-        
-        return Inertia::render('Admin/Categories/Index', [
-            'categories' => $categories,
-        ]);
-    }
-
-    /**
      * Get all categories for API.
      */
     public function all(): JsonResponse
@@ -53,91 +41,6 @@ class CategoryController extends Controller
         return $this->getCategoriesResponse(true);
     }
 
-    /**
-     * Show the form for creating a new category.
-     */
-    public function create()
-    {
-        return Inertia::render('Admin/Categories/Create', [
-            'categories' => Category::all(),
-        ]);
-    }
-
-    /**
-     * Store a newly created category.
-     */
-    public function store(Request $request)
-    {
-        $validated = $this->validateCategory($request);
-        $validated['slug'] = Str::slug($validated['name']);
-
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
-
-        Category::create($validated);
-
-        return redirect()->route('admin.categories.index')
-            ->with('success', 'Категория успешно создана');
-    }
-
-    /**
-     * Display the specified category.
-     */
-    public function show(Category $category)
-    {
-        return Inertia::render('Admin/Categories/Show', [
-            'category' => $category->load(['children', 'products']),
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified category.
-     */
-    public function edit(Category $category)
-    {
-        return Inertia::render('Admin/Categories/Edit', [
-            'category' => $category,
-            'categories' => Category::where('id', '!=', $category->id)->get(),
-        ]);
-    }
-
-    /**
-     * Update the specified category.
-     */
-    public function update(Request $request, Category $category)
-    {
-        $validated = $this->validateCategory($request);
-        $validated['slug'] = Str::slug($validated['name']);
-
-        if ($request->hasFile('image')) {
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
-
-        $category->update($validated);
-
-        return redirect()->route('admin.categories.index')
-            ->with('success', 'Категория успешно обновлена');
-    }
-
-    /**
-     * Remove the specified category.
-     */
-    public function destroy(Category $category)
-    {
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
-        
-        $category->delete();
-
-        return redirect()->route('admin.categories.index')
-            ->with('success', 'Категория успешно удалена');
-    }
-    
     /**
      * Get categories with common filtering options
      */

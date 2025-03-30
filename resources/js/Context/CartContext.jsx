@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -16,7 +16,6 @@ export function useCart() {
 // Провайдер контекста корзины для обертывания приложения
 export function CartProvider({ children }) {
     const [cart, setCart] = useState({ items: [] });
-    const [totalPrice, setTotalPrice] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -58,15 +57,6 @@ export function CartProvider({ children }) {
             return total + (safePrice * safeQuantity);
         }, 0);
     };
-
-    // Функция для обновления счетчиков без перерендеривания всей корзины
-    const updateCounters = useCallback((cartData) => {
-        if (!cartData || !cartData.items) return;
-
-        // Используем нашу функцию calculateTotal для последовательного расчета цены
-        const price = calculateTotal(cartData.items);
-        setTotalPrice(price);
-    }, []);
 
     // Загружаем данные корзины при монтировании компонента
     useEffect(() => {
@@ -204,10 +194,6 @@ export function CartProvider({ children }) {
     // Установка корзины
     const setCartWithCount = (cartData) => {
         setCart(cartData);
-        // Обновляем счетчик общей стоимости
-        if (cartData && cartData.items) {
-            updateCounters(cartData);
-        }
     };
 
     // Обновление количества товара в корзине
@@ -649,7 +635,6 @@ export function CartProvider({ children }) {
                 clearCart,
                 refreshCart,
                 getCartTotal,
-                totalPrice,
                 getCartDiscount,
                 formatPrice,
             }}

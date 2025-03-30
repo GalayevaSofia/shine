@@ -73,7 +73,7 @@ export default function WishlistItems({
                 <div className="relative z-10 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 sm:grid-cols-2">
                     {wishlistItems.map((item, index) => (
                         <div
-                            key={item.id}
+                            key={`wishlist-item-${item.product_id}`}
                             className="flex flex-col sm:flex-row overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#8072DB]/20 hover:shadow-md"
                             style={{
                                 transitionDelay: `${index * 100}ms`,

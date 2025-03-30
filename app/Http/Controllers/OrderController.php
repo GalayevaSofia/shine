@@ -304,47 +304,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Admin: Display all orders.
-     */
-    public function adminIndex()
-    {
-        $orders = Order::with('user')->latest()->paginate(10);
-        
-        return Inertia::render('Admin/Orders/Index', [
-            'orders' => $orders,
-        ]);
-    }
-
-    /**
-     * Admin: Show order details.
-     */
-    public function adminShow($id)
-    {
-        $order = Order::with(['user', 'items.product'])->findOrFail($id);
-        
-        return Inertia::render('Admin/Orders/Show', [
-            'order' => $order,
-        ]);
-    }
-
-    /**
-     * Admin: Update order status.
-     */
-    public function adminUpdate(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,processing,completed,canceled',
-            'payment_status' => 'required|in:pending,paid,failed',
-        ]);
-        
-        $order = Order::findOrFail($id);
-        $order->update($validated);
-        
-        return redirect()->route('admin.orders.show', $order->id)
-            ->with('success', 'Заказ успешно обновлён');
-    }
-    
-    /**
      * Format a single order for response
      */
     private function formatOrder($order)

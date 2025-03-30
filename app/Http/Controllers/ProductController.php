@@ -38,52 +38,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new product.
-     */
-    public function create()
-    {
-        return Inertia::render('Admin/Products/Create', [
-            'categories' => Category::all(),
-        ]);
-    }
-
-    /**
-     * Store a newly created product.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|max:2048',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'featured' => 'boolean',
-            'status' => 'required|in:active,inactive,out_of_stock',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products', 'public');
-        }
-
-        Product::create($validated);
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product created successfully.');
-    }
-
-    /**
-     * Display the specified product for admin.
-     */
-    public function show(Product $product)
-    {
-        return Inertia::render('Admin/Products/Show', [
-            'product' => $product->load('category'),
-        ]);
-    }
-
-    /**
      * Display the product details for public view.
      */
     public function details($idOrSlug)
@@ -126,61 +80,6 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse($e, 'при получении данных о товаре');
         }
-    }
-
-    /**
-     * Show the form for editing the specified product.
-     */
-    public function edit(Product $product)
-    {
-        return Inertia::render('Admin/Products/Edit', [
-            'product' => $product,
-            'categories' => Category::all(),
-        ]);
-    }
-
-    /**
-     * Update the specified product.
-     */
-    public function update(Request $request, Product $product)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|max:2048',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'featured' => 'boolean',
-            'status' => 'required|in:active,inactive,out_of_stock',
-        ]);
-
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $validated['image'] = $request->file('image')->store('products', 'public');
-        }
-
-        $product->update($validated);
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully.');
-    }
-
-    /**
-     * Remove the specified product.
-     */
-    public function destroy(Product $product)
-    {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-
-        $product->delete();
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product deleted successfully.');
     }
 
     /**

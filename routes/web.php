@@ -123,30 +123,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Заказы
-    Route::get('/api/orders', [App\Http\Controllers\OrderController::class, 'index'])
-        ->name('account.orders.index');
+    // Перенесено в api.php
+    // Route::get('/api/orders', [App\Http\Controllers\OrderController::class, 'index'])
+    //    ->name('account.orders.index');
 
     Route::post('/account/orders', [App\Http\Controllers\CheckoutController::class, 'store'])
         ->name('account.orders.store');
-});
-
-// Админка
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
-
-    Route::get('/products', function () {
-        return Inertia::render('Admin/Products');
-    })->name('products');
-
-    Route::get('/orders', function () {
-        return Inertia::render('Admin/Orders');
-    })->name('orders');
-
-    Route::get('/users', function () {
-        return Inertia::render('Admin/Users');
-    })->name('users');
 });
 
 Route::get('/promotions', function () {
@@ -197,12 +179,5 @@ Route::get('/promotions/{slug}', function ($slug) {
         ]);
     }
 })->name('promotion.detail');
-
-Route::prefix('api')->group(function () {
-    Route::get('/catalog', [ProductController::class, 'catalog']);
-    Route::get('/categories/featured', [CategoryController::class, 'featured']);
-    Route::get('/promotions', [PromotionController::class, 'index']);
-    Route::get('/promotions/{slug}', [PromotionController::class, 'show']);
-});
 
 require __DIR__.'/auth.php';
