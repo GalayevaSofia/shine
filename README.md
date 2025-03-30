@@ -1,59 +1,59 @@
-# Shine E-commerce Application
+# Интернет-магазин Shine
 
-Shine is a modern e-commerce platform built with Laravel and React. The application includes product catalog, shopping cart, checkout, and user management features.
+Shine — это современная платформа электронной коммерции, созданная с использованием Laravel и React. Приложение включает в себя каталог товаров, корзину покупок, оформление заказа и функции управления пользователями.
 
-## Features
+## Возможности
 
-- Product catalog with categories and filters
-- User authentication and registration
-- Shopping cart functionality
-- Order processing and history
-- Admin panel for product/order management
-- Promotions and discount codes
+- Каталог товаров с категориями и фильтрами
+- Аутентификация и регистрация пользователей
+- Функционал корзины покупок
+- Обработка заказов и история
+- Панель администратора для управления товарами/заказами
+- Акции и скидочные коды
 
-## Tech Stack
+## Технологический стек
 
-- **Backend**: Laravel 12, PHP 8.2+
-- **Frontend**: React, Inertia.js
-- **Styling**: Tailwind CSS
-- **Database**: MySQL/PostgreSQL
+- **Бэкенд**: Laravel 12, PHP 8.2+
+- **Фронтенд**: React, Inertia.js
+- **Стилизация**: Tailwind CSS
+- **База данных**: MySQL/PostgreSQL
 
-## Requirements
+## Требования
 
 - PHP 8.2+
 - Composer
-- Node.js and npm
-- MySQL or PostgreSQL database
+- Node.js и npm
+- База данных MySQL или PostgreSQL
 
-## Installation
+## Установка
 
-1. Clone the repository:
+1. Клонировать репозиторий:
 ```
 git clone https://github.com/yourusername/shine.git
 cd shine
 ```
 
-2. Install PHP dependencies:
+2. Установить PHP-зависимости:
 ```
 composer install
 ```
 
-3. Install JavaScript dependencies:
+3. Установить JavaScript-зависимости:
 ```
 npm install
 ```
 
-4. Create an environment file:
+4. Создать файл окружения:
 ```
 cp .env.example .env
 ```
 
-5. Generate application key:
+5. Сгенерировать ключ приложения:
 ```
 php artisan key:generate
 ```
 
-6. Configure your database in the `.env` file:
+6. Настроить базу данных в файле `.env`:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -63,93 +63,93 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-7. Run the migrations and seed the database:
+7. Выполнить миграции и заполнить базу данных:
 ```
 php artisan migrate --seed
 ```
 
-8. Create a symbolic link for storage:
+8. Создать символическую ссылку для хранилища:
 ```
 php artisan storage:link
 ```
 
-9. Build assets:
+9. Собрать ресурсы:
 ```
 npm run build
 ```
 
-## Running the Application
+## Запуск приложения
 
-1. For development:
+1. Для разработки:
 ```
 composer dev
 ```
-This will concurrently run the Laravel server, queue worker, logs, and Vite dev server.
+Это запустит одновременно сервер Laravel, обработчик очередей, логи и сервер разработки Vite.
 
-2. For production:
+2. Для производственной среды:
 ```
 npm run build
 php artisan serve
 ```
 
-## Default Credentials
+## Учетные данные по умолчанию
 
-**Admin User**:
+**Администратор**:
 - Email: admin@example.com
-- Password: password
+- Пароль: password
 
-**Test User**:
+**Тестовый пользователь**:
 - Email: test@example.com
-- Password: password
+- Пароль: password
 
-## API Endpoints
+## API-эндпоинты
 
-### Public
+### Публичные
 
-- `GET /api/home` - Home page data (featured products, categories, promotions)
-- `GET /api/categories` - List all categories
-- `GET /api/products` - Product catalog with filters
-- `GET /api/products/featured` - Featured products
-- `GET /api/products/{id}` - Product details
-- `GET /api/promotions/active` - Active promotions
-- `POST /api/promotions/apply` - Apply promotion code
+- `GET /api/home` - Данные главной страницы (популярные товары, категории, акции)
+- `GET /api/categories` - Список всех категорий
+- `GET /api/products` - Каталог товаров с фильтрами
+- `GET /api/products/featured` - Популярные товары
+- `GET /api/products/{id}` - Детали товара
+- `GET /api/promotions/active` - Активные акции
+- `POST /api/promotions/apply` - Применить промокод
 
-### Cart
+### Корзина
 
-- `GET /api/cart` - View cart
-- `POST /api/cart/add` - Add item to cart
-- `PUT /api/cart/items/{id}` - Update cart item
-- `DELETE /api/cart/items/{id}` - Remove item from cart
-- `DELETE /api/cart/clear` - Clear cart
+- `GET /api/cart` - Просмотр корзины
+- `POST /api/cart/add` - Добавить товар в корзину
+- `PUT /api/cart/items/{id}` - Обновить позицию в корзине
+- `DELETE /api/cart/items/{id}` - Удалить позицию из корзины
+- `DELETE /api/cart/clear` - Очистить корзину
 
-### Authentication Required
+### Требуют аутентификации
 
-- `GET /api/orders` - List user orders
-- `POST /api/orders` - Create new order
-- `GET /api/orders/{id}` - Order details
-- `POST /api/orders/{id}/cancel` - Cancel order
+- `GET /api/orders` - Список заказов пользователя
+- `POST /api/orders` - Создать новый заказ
+- `GET /api/orders/{id}` - Детали заказа
+- `POST /api/orders/{id}/cancel` - Отменить заказ
 
-### Admin Only
+### Только для администратора
 
-- `GET /api/admin/categories` - List categories (admin)
-- `POST /api/admin/categories` - Create category
-- `PUT /api/admin/categories/{id}` - Update category
-- `DELETE /api/admin/categories/{id}` - Delete category
+- `GET /api/admin/categories` - Список категорий (админ)
+- `POST /api/admin/categories` - Создать категорию
+- `PUT /api/admin/categories/{id}` - Обновить категорию
+- `DELETE /api/admin/categories/{id}` - Удалить категорию
 
-- `GET /api/admin/products` - List products (admin)
-- `POST /api/admin/products` - Create product
-- `PUT /api/admin/products/{id}` - Update product
-- `DELETE /api/admin/products/{id}` - Delete product
+- `GET /api/admin/products` - Список товаров (админ)
+- `POST /api/admin/products` - Создать товар
+- `PUT /api/admin/products/{id}` - Обновить товар
+- `DELETE /api/admin/products/{id}` - Удалить товар
 
-- `GET /api/admin/orders` - List all orders
-- `GET /api/admin/orders/{id}` - Order details (admin)
-- `PUT /api/admin/orders/{id}` - Update order status
+- `GET /api/admin/orders` - Список всех заказов
+- `GET /api/admin/orders/{id}` - Детали заказа (админ)
+- `PUT /api/admin/orders/{id}` - Обновить статус заказа
 
-- `GET /api/admin/promotions` - List promotions
-- `POST /api/admin/promotions` - Create promotion
-- `PUT /api/admin/promotions/{id}` - Update promotion
-- `DELETE /api/admin/promotions/{id}` - Delete promotion
+- `GET /api/admin/promotions` - Список акций
+- `POST /api/admin/promotions` - Создать акцию
+- `PUT /api/admin/promotions/{id}` - Обновить акцию
+- `DELETE /api/admin/promotions/{id}` - Удалить акцию
 
-## License
+## Лицензия
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Фреймворк Laravel является программным обеспечением с открытым исходным кодом, лицензированным в соответствии с [лицензией MIT](https://opensource.org/licenses/MIT).
