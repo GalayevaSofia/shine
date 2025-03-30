@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add custom animation for fading in notifications */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Статические страницы */
+.static-page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.static-page-section {
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.static-page-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.static-page-section-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.static-page-section-icon svg {
+    width: 28px;
+    height: 28px;
+    color: #fa6bae;
+}
+
+.contact-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.contact-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.contact-button.phone {
+    background: linear-gradient(135deg, #fa6bae 0%, #fa9dd0 100%);
+    color: white;
+}
+
+.contact-button.email {
+    background: linear-gradient(135deg, #9f7aea 0%, #b3a1ea 100%);
+    color: white;
+}
+
+.contact-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.payment-method-icons {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.payment-method-icons img {
+    height: 32px;
+    object-fit: contain;
+}
