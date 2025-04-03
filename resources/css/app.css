@@ -15,8 +15,103 @@
     }
 }
 
+/* Анимация появления элементов каталога */
+@keyframes itemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Градиент анимации */
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Пульсация для изображений товаров */
+@keyframes softPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(214, 188, 250, 0.3);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(214, 188, 250, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(214, 188, 250, 0);
+    }
+}
+
 .animate-fade-in {
     animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-item-fade-in {
+    animation: itemFadeIn 0.5s ease-out forwards;
+}
+
+.animate-gradient {
+    animation: gradient 3s ease infinite;
+}
+
+.animate-soft-pulse {
+    animation: softPulse 2s infinite;
+}
+
+.bg-size-200 {
+    background-size: 200% 200%;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Изображения товаров */
+.product-image-container {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.05),
+        0 4px 6px -2px rgba(0, 0, 0, 0.03),
+        inset 0 0 15px rgba(255, 255, 255, 0.9);
+}
+
+.product-image {
+    mix-blend-mode: multiply;
+    filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04));
+    transition: all 0.3s ease-out;
+    transform-origin: center;
+    object-position: center;
+}
+
+.product-image:hover {
+    transform: scale(1.03);
+}
+
+/* Добавляем hover-анимацию для контейнера */
+.product-image-container:hover {
+    box-shadow:
+        0 15px 30px -5px rgba(0, 0, 0, 0.08),
+        0 8px 10px -5px rgba(0, 0, 0, 0.05),
+        inset 0 0 15px rgba(255, 255, 255, 0.9);
+    animation: softPulse 1.5s infinite;
 }
 
 /* Статические страницы */
@@ -96,4 +191,38 @@
 .payment-method-icons img {
     height: 32px;
     object-fit: contain;
+}
+
+/* Добавляем стиль для карточек товаров в акциях */
+.aspect-w-1.aspect-h-1 {
+    position: relative;
+    padding-bottom: 100%;
+}
+
+.aspect-w-1.aspect-h-1>* {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+/* Изображения в карточках акций */
+.aspect-w-1.aspect-h-1 .product-image {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+    border-radius: 0;
+    transition: all 0.3s ease;
+}
+
+/* Эффект при наведении на карточку товара в акции */
+.aspect-w-1.aspect-h-1:hover .product-image {
+    transform: scale(1.05);
+    box-shadow: none;
+}
+
+/* Анимация карточки товара при наведении */
+.rounded-lg:hover .aspect-w-1.aspect-h-1 {
+    animation: none;
 }

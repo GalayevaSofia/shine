@@ -59,6 +59,9 @@ export default function WishlistItems({
         );
     }
 
+    // Log the first item structure to debug
+    console.log('First wishlist item structure:', wishlistItems[0]);
+
     return (
         <div className="mx-auto max-w-6xl">
             <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 sm:p-6 shadow-lg">
@@ -71,19 +74,24 @@ export default function WishlistItems({
                 </h2>
 
                 <div className="relative z-10 grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 sm:grid-cols-2">
-                    {wishlistItems.map((item, index) => (
+                    {wishlistItems.map((item, index) => {
+                        // Fix the way we access the product data
+                        const product = item.product || {}; // Ensure product exists
+                        const productId = item.product_id || product.id || 0;
+                        
+                        return (
                         <div
-                            key={`wishlist-item-${item.product_id}`}
+                            key={`wishlist-item-${productId}`}
                             className="flex flex-col sm:flex-row overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:border-[#8072DB]/20 hover:shadow-md"
                             style={{
                                 transitionDelay: `${index * 100}ms`,
                             }}
                         >
                             <div className="w-full sm:w-32 h-32 sm:h-32 flex-shrink-0 overflow-hidden">
-                                <Link href={`/products/${item.product.id}`}>
+                                <Link href={`/products/${product.id}`}>
                                     <img
-                                        src={getImageUrl(item.product.image)}
-                                        alt={item.product.name}
+                                        src={getImageUrl(product.image)}
+                                        alt={product.name}
                                         className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                                         onError={(e) => {
                                             e.target.onerror = null;
@@ -95,43 +103,43 @@ export default function WishlistItems({
                             <div className="flex-grow p-3 sm:p-4">
                                 <div className="flex flex-col sm:flex-row sm:justify-between">
                                     <h3 className="font-medium text-gray-900 transition-all hover:bg-gradient-to-r hover:from-[#B86FBF] hover:via-[#8072DB] hover:to-[#5A8BEA] hover:bg-clip-text hover:text-transparent line-clamp-1">
-                                        <Link href={`/products/${item.product.id}`}>
-                                            {item.product.name}
+                                        <Link href={`/products/${product.id}`}>
+                                            {product.name}
                                         </Link>
                                     </h3>
                                     <p className="mt-1 sm:mt-0 font-bold text-[#8072DB]">
                                         {(() => {
-                                            const discount = calculateDiscount(item.product);
+                                            const discount = calculateDiscount(product);
                                             if (discount) {
                                                 return (
                                                     <>
                                                         <span className="font-bold text-[#8072DB]">
-                                                            {formatPrice(discount.discountPrice)} ₽
+                                                            {formatPrice(discount.discountPrice)}
                                                         </span>
                                                         <span className="ml-2 text-sm text-gray-500 line-through">
-                                                            {formatPrice(item.product.price)} ₽
+                                                            {formatPrice(product.price)}
                                                         </span>
                                                     </>
                                                 );
                                             } else {
-                                                return `${formatPrice(item.product.price)} ₽`;
+                                                return formatPrice(product.price);
                                             }
                                         })()}
                                     </p>
                                 </div>
                                 <p className="mt-1 line-clamp-1 text-xs sm:text-sm text-gray-600">
-                                    {item.product.description}
+                                    {product.description}
                                 </p>
                                 <div className="mt-2 sm:mt-3 flex flex-wrap gap-2 sm:gap-0 sm:flex-nowrap justify-between">
                                     <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:space-x-3">
                                         <Link
-                                            href={`/products/${item.product.id}`}
+                                            href={`/products/${product.id}`}
                                             className="rounded-lg border border-[#8072DB]/30 px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#8072DB] transition-all hover:bg-[#8072DB] hover:text-white"
                                         >
                                             Подробнее
                                         </Link>
                                         <button
-                                            onClick={() => handleAddToCart(item.product.id, item.product.name)}
+                                            onClick={() => handleAddToCart(product.id, product.name)}
                                             className="rounded-lg bg-gradient-to-r from-[#B86FBF] via-[#8072DB] to-[#5A8BEA] px-2 sm:px-3 py-1 text-xs sm:text-sm text-white shadow-sm transition-all hover:opacity-90"
                                         >
                                             В корзину
@@ -139,7 +147,7 @@ export default function WishlistItems({
                                     </div>
                                     <div className="flex items-center w-full sm:w-auto justify-between sm:justify-normal mt-2 sm:mt-0">
                                         {(() => {
-                                            const discount = calculateDiscount(item.product);
+                                            const discount = calculateDiscount(product);
                                             if (discount) {
                                                 return (
                                                     <span className="mr-2 bg-red-100 text-red-800 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
@@ -150,7 +158,7 @@ export default function WishlistItems({
                                             return null;
                                         })()}
                                         <button
-                                            onClick={() => removeFromWishlist(item.product_id)}
+                                            onClick={() => removeFromWishlist(productId)}
                                             className="text-xs sm:text-sm text-red-500 transition-colors hover:text-red-600"
                                         >
                                             Удалить
@@ -159,7 +167,7 @@ export default function WishlistItems({
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )})}
                 </div>
             </div>
         </div>

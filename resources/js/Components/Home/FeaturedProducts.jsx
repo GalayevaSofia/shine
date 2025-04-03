@@ -31,7 +31,7 @@ export default function FeaturedProducts() {
     }, []);
 
     return (
-        <section className="py-8 sm:py-10 lg:py-12 max-w-7xl mx-auto">
+        <section className="py-8 sm:py-10 lg:py-12 max-w-[1440px] mx-auto">
             <h2 className="text-2xl sm:text-3xl text-center font-bold text-gray-900 mb-6 sm:mb-8 lg:mb-10">
                 Популярные <span className="bg-gradient-to-r from-[#E6A8D7] via-[#B8C0FF] to-[#BBD0FF] bg-clip-text text-transparent">товары</span>
             </h2>
@@ -50,7 +50,7 @@ export default function FeaturedProducts() {
                     buttonClassName={BUTTON_CLASS}
                 />
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
                     {featuredProducts.map(product => (
                         <ProductCard key={product.id} product={product} />
                     ))}

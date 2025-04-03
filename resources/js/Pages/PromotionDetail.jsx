@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import MainLayout from '@/Components/Layout/MainLayout';
 import LoadingIndicator from '@/Components/UI/LoadingIndicator';
@@ -8,12 +8,23 @@ import BackLink from '@/Components/UI/BackLink';
 import PromotionHeader from '@/Components/Promotions/PromotionHeader';
 import PromotionProductsGrid from '@/Components/Promotions/PromotionProductsGrid';
 import usePromotionDetail from '@/hooks/usePromotionDetail';
+import useAnimateSections from '@/hooks/useAnimateSections';
 
 const CONTAINER_CLASS = "container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-10";
 const META_VIEWPORT = <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />;
 
 const PromotionDetail = ({ promotion = null, error = null }) => {
     const { isLoading, promotion: currentPromotion, error: errorMessage, calculateDiscount } = usePromotionDetail(promotion, error);
+    
+    // Состояние для отслеживания видимости секций
+    const [animateSection, setAnimateSection] = useState({
+        navigation: false,
+        header: false,
+        products: false
+    });
+    
+    // Подключаем хук для анимации секций при скролле
+    useAnimateSections(setAnimateSection);
 
     if (isLoading) {
         return (
@@ -47,22 +58,29 @@ const PromotionDetail = ({ promotion = null, error = null }) => {
             <Head title={currentPromotion.title}>{META_VIEWPORT}</Head>
             
             <div className={CONTAINER_CLASS}>
-                <div className="mb-4 sm:mb-6">
+                {/* Навигация с анимацией */}
+                <div id="promotion-navigation-section" className={`mb-4 sm:mb-6 ${animateSection.navigation ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-700`}>
                     <BackLink href="/promotions">
                         Вернуться к списку акций
                     </BackLink>
                 </div>
 
-                <PromotionHeader promotion={currentPromotion} />
+                {/* Заголовок акции с анимацией */}
+                <div id="promotion-header-section" className={`${animateSection.header ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-700 delay-100`}>
+                    <PromotionHeader promotion={currentPromotion} />
 
-                <PageTitle className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
-                    Товары, участвующие в акции
-                </PageTitle>
+                    <PageTitle className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
+                        Товары, участвующие в акции
+                    </PageTitle>
+                </div>
                 
-                <PromotionProductsGrid 
-                    products={currentPromotion.products} 
-                    calculateDiscount={calculateDiscount}
-                />
+                {/* Товары акции с анимацией */}
+                <div id="promotion-products-section" className={`${animateSection.products ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} transition-all duration-700 delay-200`}>
+                    <PromotionProductsGrid 
+                        products={currentPromotion.products} 
+                        calculateDiscount={calculateDiscount}
+                    />
+                </div>
             </div>
         </MainLayout>
     );

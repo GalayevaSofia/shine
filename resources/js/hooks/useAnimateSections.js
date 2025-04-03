@@ -9,15 +9,35 @@ export default function useAnimateSections(setAnimateSection) {
 		const handleScroll = () => {
 			const scrollPosition = window.scrollY + window.innerHeight;
 			const sections = {
+				// Секции для страницы About
 				'stats-section': 'stats',
 				'tabs-section': 'tabs',
 				'team-section': 'team',
-				'cta-section': 'cta'
+				'cta-section': 'cta',
+
+				// Секции для страницы Catalog
+				'header-section': 'header',
+				'filters-section': 'filters',
+				'products-section': 'products',
+
+				// Секции для страницы Promotions
+				'promotion-title-section': 'title',
+				'promotions-section': 'promotions',
+
+				// Секции для страницы деталей акции
+				'promotion-navigation-section': 'navigation',
+				'promotion-header-section': 'header',
+				'promotion-products-section': 'products',
+
+				// Секции для страницы контактов
+				'contact-header-section': 'header',
+				'contact-info-section': 'contacts',
+				'contact-form-section': 'form'
 			};
 
 			Object.entries(sections).forEach(([sectionId, stateName]) => {
 				const section = document.getElementById(sectionId);
-				if (section && scrollPosition > section.offsetTop + 100) {
+				if (section && scrollPosition > section.offsetTop + 50) {
 					setAnimateSection(prev => ({ ...prev, [stateName]: true }));
 				}
 			});

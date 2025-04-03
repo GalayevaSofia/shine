@@ -54,8 +54,9 @@ export default function useProductDetail(initialProduct) {
 		try {
 			const result = await addToCart(initialProduct.id, quantity);
 			if (result?.success) {
-				setAddToCartSuccess(true);
-				setTimeout(() => setAddToCartSuccess(false), 3000);
+				// Удаляем уведомление об успешном добавлении
+				// setAddToCartSuccess(true);
+				// setTimeout(() => setAddToCartSuccess(false), 3000);
 			} else {
 				setAddToCartError(result?.message || 'Ошибка при добавлении товара');
 			}
@@ -67,7 +68,7 @@ export default function useProductDetail(initialProduct) {
 		}
 	};
 
-	// Prepare breadcrumbs
+	// Подготовка хлебных крошек
 	const getBreadcrumbItems = () => {
 		return [
 			{ name: 'Каталог', href: '/catalog' },

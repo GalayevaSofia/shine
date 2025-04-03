@@ -51,8 +51,8 @@ const features = [
  */
 export default function Features() {
     return (
-        <div className="bg-white py-16 sm:py-20 md:py-24 lg:py-32">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="py-10 sm:py-12 lg:py-16 bg-gray-50">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
                 {/* Заголовок секции */}
                 <div className="flex flex-col items-center text-center">
                     <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">Почему выбирают нас</h2>

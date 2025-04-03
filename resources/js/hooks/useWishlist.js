@@ -20,7 +20,8 @@ export function useCsrfToken() {
 		if (csrfTokenInitialized) return;
 
 		try {
-			await axios.get('/sanctum/csrf-cookie');
+			// Используем POST запрос для гарантии обновления CSRF токена
+			await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
 			csrfTokenInitialized = true;
 		} catch (error) {
 			console.error('Ошибка получения CSRF токена:', error);
@@ -68,6 +69,7 @@ export function useWishlistCache() {
 export function useWishlistStatus(productId) {
 	const safeProductId = Number(productId) || 0;
 	const { hasInCache, getFromCache, saveToCache } = useWishlistCache();
+	const initializeCsrfToken = useCsrfToken();
 
 	// Проверка статуса товара в избранном
 	const checkStatus = useCallback(async () => {
@@ -79,7 +81,8 @@ export function useWishlistStatus(productId) {
 		}
 
 		try {
-			const response = await axios.get(`/api/wishlist/check/${safeProductId}`);
+			await initializeCsrfToken();
+			const response = await axios.get(`/api/wishlist/check/${safeProductId}`, { withCredentials: true });
 			if (response.data.success) {
 				const status = response.data.inWishlist;
 				saveToCache(safeProductId, status);
@@ -90,7 +93,7 @@ export function useWishlistStatus(productId) {
 		}
 
 		return null;
-	}, [safeProductId, hasInCache, getFromCache, saveToCache]);
+	}, [safeProductId, hasInCache, getFromCache, saveToCache, initializeCsrfToken]);
 
 	return { checkStatus };
 }
@@ -112,10 +115,20 @@ export function useWishlistOperations(productId) {
 
 		try {
 			await initializeCsrfToken();
-			const response = await axios.post(`/api/wishlist/${safeProductId}`);
+			const response = await axios.post(`/api/wishlist/${safeProductId}`, {}, { withCredentials: true });
 
 			if (response.data.success) {
 				saveToCache(safeProductId, true);
+
+				// Обновляем глобальное состояние wishlistItems, если оно существует
+				if (window.refreshWishlist && typeof window.refreshWishlist === 'function') {
+					try {
+						window.refreshWishlist();
+					} catch (refreshError) {
+						console.error('Failed to refresh wishlist:', refreshError);
+					}
+				}
+
 				return true;
 			}
 		} catch (error) {
@@ -142,10 +155,20 @@ export function useWishlistOperations(productId) {
 
 		try {
 			await initializeCsrfToken();
-			const response = await axios.delete(`/api/wishlist/${safeProductId}`);
+			const response = await axios.delete(`/api/wishlist/${safeProductId}`, { withCredentials: true });
 
 			if (response.data.success) {
 				saveToCache(safeProductId, false);
+
+				// Обновляем глобальное состояние wishlistItems, если оно существует
+				if (window.refreshWishlist && typeof window.refreshWishlist === 'function') {
+					try {
+						window.refreshWishlist();
+					} catch (refreshError) {
+						console.error('Failed to refresh wishlist:', refreshError);
+					}
+				}
+
 				return true;
 			}
 		} catch (error) {
@@ -245,4 +268,40 @@ export function useWishlist(productId) {
 		isLoading,
 		toggleWishlist
 	};
+}
+
+/**
+ * Хук для пакетной проверки товаров в избранном
+ * @param {Array<number>} productIds - Массив ID товаров
+ * @returns {Object} - Методы для проверки
+ */
+export function useBatchWishlistCheck() {
+	const { saveToCache } = useWishlistCache();
+	const initializeCsrfToken = useCsrfToken();
+
+	// Пакетная проверка статуса товаров
+	const checkBatch = useCallback(async (productIds) => {
+		if (!productIds || !productIds.length) return {};
+
+		try {
+			await initializeCsrfToken();
+			const idsParam = productIds.join(',');
+			const response = await axios.get(`/api/wishlist/check-batch?ids=${idsParam}`, { withCredentials: true });
+
+			if (response.data.success && response.data.items) {
+				// Обновляем кэш
+				Object.entries(response.data.items).forEach(([id, status]) => {
+					saveToCache(Number(id), status);
+				});
+
+				return response.data.items;
+			}
+		} catch (error) {
+			console.error('Ошибка пакетной проверки избранного:', error);
+		}
+
+		return {};
+	}, [saveToCache, initializeCsrfToken]);
+
+	return { checkBatch };
 }

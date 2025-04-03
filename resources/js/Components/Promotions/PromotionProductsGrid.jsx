@@ -18,16 +18,24 @@ export default function PromotionProductsGrid({ products = [], calculateDiscount
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-            {products.map((product) => (
-                <PromotionProductItem
-                    key={product.id}
-                    product={{
-                        ...product,
-                        pivot: {
-                            promotional_price: calculateDiscount(product)?.discountPrice
-                        }
+            {products.map((product, index) => (
+                <div 
+                    key={product.id} 
+                    className="opacity-0 translate-y-8 animate-item-fade-in"
+                    style={{ 
+                        animationDelay: `${index * 50}ms`,
+                        animationFillMode: 'forwards'
                     }}
-                />
+                >
+                    <PromotionProductItem
+                        product={{
+                            ...product,
+                            pivot: {
+                                promotional_price: calculateDiscount(product)?.discountPrice
+                            }
+                        }}
+                    />
+                </div>
             ))}
         </div>
     );

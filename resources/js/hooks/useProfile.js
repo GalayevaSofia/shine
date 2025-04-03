@@ -11,7 +11,8 @@ export default function useProfile(initialTab = 'profile') {
 	const [orders, setOrders] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isOrdersLoading, setIsOrdersLoading] = useState(false);
-	const [showSuccessMessage, setShowSuccessMessage] = useState(!!flash?.success);
+	const [showProfileSuccessMessage, setShowProfileSuccessMessage] = useState(!!flash?.success);
+	const [showPasswordSuccessMessage, setShowPasswordSuccessMessage] = useState(false);
 	const [authStatus, setAuthStatus] = useState({
 		checked: true,
 		authenticated: auth.user !== null,
@@ -37,74 +38,157 @@ export default function useProfile(initialTab = 'profile') {
 
 	// Load wishlist data when tab is active
 	useEffect(() => {
-		if (activeTab === 'wishlist') {
-			loadWishlist();
-		} else if (activeTab === 'orders' && authStatus.authenticated) {
-			fetchOrders();
-		}
+		let isMounted = true;
+
+		const loadData = async () => {
+			if (activeTab === 'wishlist') {
+				setIsLoading(true);
+				try {
+					await loadWishlist();
+				} catch (error) {
+					console.error('Error loading wishlist tab data:', error);
+				} finally {
+					if (isMounted) setIsLoading(false);
+				}
+			} else if (activeTab === 'orders' && authStatus.authenticated) {
+				setIsOrdersLoading(true);
+				try {
+					await fetchOrders();
+				} catch (error) {
+					console.error('Error loading orders tab data:', error);
+				} finally {
+					if (isMounted) setIsOrdersLoading(false);
+				}
+			}
+		};
+
+		loadData();
+
+		return () => {
+			isMounted = false;
+		};
 	}, [activeTab, authStatus.authenticated]);
+
+	// Регистрируем функцию обновления в глобальном пространстве
+	useEffect(() => {
+		// Добавляем глобальную функцию обновления wishlist
+		window.refreshWishlist = loadWishlist;
+
+		// Очистка при размонтировании
+		return () => {
+			window.refreshWishlist = null;
+		};
+	}, []);
 
 	// Handle success message
 	useEffect(() => {
 		if (flash?.success) {
-			setShowSuccessMessage(true);
-			setTimeout(() => setShowSuccessMessage(false), 5000);
+			setShowProfileSuccessMessage(true);
+			setTimeout(() => setShowProfileSuccessMessage(false), 5000);
 		}
 	}, [flash?.success]);
 
 	const loadWishlist = async () => {
-		setIsLoading(true);
 		try {
+			console.log("Loading wishlist data...");
 			await checkAuthAndFetchWishlist();
 			await fetchPromotions();
+			console.log("Wishlist data loaded successfully");
 		} catch (error) {
 			console.error('Error initializing wishlist:', error);
-		} finally {
-			setIsLoading(false);
+			throw error; // Пробрасываем ошибку дальше для обработки в useEffect
 		}
 	};
 
 	const checkAuthAndFetchWishlist = async () => {
 		try {
-			const authResponse = await axios.get('/api/auth/check');
+			// Всегда сначала обновляем CSRF токен
+			await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+
+			const authResponse = await axios.get('/api/auth/check', { withCredentials: true });
+			console.log('Auth check response:', authResponse.data);
+
+			// Если пользователь авторизован через сессию, запрашиваем избранное
 			if (authResponse.data.authenticated) {
-				fetchWishlistItems();
+				await fetchWishlistItems();
+			} else {
+				// Проверяем авторизацию по auth.user из props страницы
+				if (auth.user) {
+					console.log('User authenticated via page props, fetching wishlist');
+					await fetchWishlistItems();
+				} else {
+					console.log('User not authenticated in any way. Please log in to view wishlist.');
+					setWishlistItems([]);
+				}
 			}
 		} catch (error) {
 			console.error('Ошибка аутентификации:', error);
-			if (error.response?.status === 401) {
+			// Даже если получили ошибку, но пользователь авторизован через props страницы
+			if (auth.user) {
+				console.log('Despite auth error, user is authenticated via page props');
 				try {
-					await axios.get('/sanctum/csrf-cookie');
-					const newAuthResponse = await axios.get('/api/auth/check');
-					if (newAuthResponse.data.authenticated) {
-						fetchWishlistItems();
-					}
-				} catch (csrfError) {
-					console.error('Ошибка обновления CSRF токена:', csrfError);
+					await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+					await fetchWishlistItems();
+				} catch (retryError) {
+					console.error('Ошибка при повторной попытке:', retryError);
+					setWishlistItems([]);
 				}
+			} else {
+				setWishlistItems([]);
 			}
 		}
 	};
 
 	const fetchWishlistItems = async () => {
 		try {
-			const { data } = await axios.get('/api/wishlist');
+			// Принудительно обновляем CSRF токен перед запросом избранного
+			await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+
+			const { data } = await axios.get('/api/wishlist', { withCredentials: true });
 			if (data.success) {
 				setWishlistItems(data.data);
+				console.log('Wishlist items loaded:', data.data);
+			} else {
+				console.error('Failed to load wishlist items:', data);
+				setWishlistItems([]);
 			}
 		} catch (error) {
 			console.error('Error fetching wishlist:', error);
+			if (error.response?.status === 401) {
+				console.error('User authentication required for wishlist');
+				// Добавим попытку обновить аутентификацию
+				try {
+					await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+					const { data } = await axios.get('/api/wishlist', { withCredentials: true });
+					if (data.success) {
+						setWishlistItems(data.data);
+						console.log('Wishlist items loaded after CSRF refresh:', data.data);
+					} else {
+						setWishlistItems([]);
+					}
+				} catch (retryError) {
+					console.error('Failed to authenticate after retry:', retryError);
+					setWishlistItems([]);
+				}
+			} else {
+				setWishlistItems([]);
+			}
 		}
 	};
 
 	const fetchPromotions = async () => {
 		try {
-			const { data } = await axios.get('/api/promotions');
+			const { data } = await axios.get('/api/promotions', { withCredentials: true });
 			if (data.success) {
 				setPromotions(data.data.promotions);
+				console.log('Promotions loaded:', data.data.promotions?.length || 0);
+			} else {
+				console.error('Failed to load promotions:', data);
+				setPromotions([]);
 			}
 		} catch (error) {
 			console.error('Error fetching promotions:', error);
+			setPromotions([]);
 		}
 	};
 
@@ -157,17 +241,75 @@ export default function useProfile(initialTab = 'profile') {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+
+		// Валидация формата телефона
+		if (data.phone && !isValidPhoneNumber(data.phone)) {
+			setErrors({ ...errors, phone: 'Пожалуйста, введите корректный номер телефона' });
+			return;
+		}
+
+		// Фильтруем данные для отправки - только личная информация
+		const profileData = {
+			name: data.name,
+			email: data.email,
+			phone: data.phone,
+			address: data.address,
+			city: data.city,
+			zip: data.zip,
+			country: data.country,
+		};
+
 		patch(route('profile.update'), {
+			data: profileData,
 			preserveScroll: true,
 			onSuccess: () => {
-				setShowSuccessMessage(true);
+				showNotification('Профиль успешно обновлен', 'success');
+				setShowProfileSuccessMessage(true);
+				setTimeout(() => setShowProfileSuccessMessage(false), 5000);
+			},
+		});
+	};
+
+	const handlePasswordSubmit = (e) => {
+		e.preventDefault();
+
+		// Проверка на заполнение полей пароля
+		if (!data.current_password) {
+			showNotification('Введите текущий пароль', 'error');
+			return;
+		}
+
+		if (!data.new_password) {
+			showNotification('Введите новый пароль', 'error');
+			return;
+		}
+
+		if (data.new_password !== data.new_password_confirmation) {
+			showNotification('Пароли не совпадают', 'error');
+			return;
+		}
+
+		// Отправляем только данные пароля
+		const passwordData = {
+			current_password: data.current_password,
+			new_password: data.new_password,
+			new_password_confirmation: data.new_password_confirmation,
+		};
+
+		patch(route('profile.update'), {
+			data: passwordData,
+			preserveScroll: true,
+			onSuccess: () => {
+				showNotification('Пароль успешно обновлен', 'success');
+				setShowPasswordSuccessMessage(true);
+				// Очищаем поля пароля после успешного обновления
 				setData({
 					...data,
 					current_password: '',
 					new_password: '',
 					new_password_confirmation: '',
 				});
-				setTimeout(() => setShowSuccessMessage(false), 5000);
+				setTimeout(() => setShowPasswordSuccessMessage(false), 5000);
 			},
 		});
 	};
@@ -205,14 +347,8 @@ export default function useProfile(initialTab = 'profile') {
 	const handleAddToCart = async (productId, productName) => {
 		try {
 			const result = await addToCart(productId);
-			if (result?.success) {
-				showNotification(`${productName} добавлен в корзину`, 'success');
-			} else {
-				showNotification(result?.message || 'Ошибка добавления в корзину', 'error');
-			}
 		} catch (error) {
 			console.error('Ошибка при добавлении в корзину:', error);
-			showNotification('Ошибка добавления в корзину', 'error');
 		}
 	};
 
@@ -226,6 +362,17 @@ export default function useProfile(initialTab = 'profile') {
 		}
 	};
 
+	// Вспомогательная функция для валидации телефона
+	const isValidPhoneNumber = (phone) => {
+		// Проверка на соответствие формату +7 (XXX) XXX-XX-XX
+		const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+
+		// Если телефон не заполнен, считаем это допустимым (не обязательное поле)
+		if (!phone || phone === '+7') return true;
+
+		return phoneRegex.test(phone);
+	};
+
 	return {
 		// State
 		activeTab,
@@ -234,7 +381,8 @@ export default function useProfile(initialTab = 'profile') {
 		orders,
 		isLoading,
 		isOrdersLoading,
-		showSuccessMessage,
+		showProfileSuccessMessage,
+		showPasswordSuccessMessage,
 		authStatus,
 		notification,
 		data,
@@ -246,11 +394,12 @@ export default function useProfile(initialTab = 'profile') {
 		// Methods
 		setData,
 		handleSubmit,
+		handlePasswordSubmit,
 		handleLogout,
 		removeFromWishlist,
-		handleAddToCart,
 		calculateDiscount,
+		handleAddToCart,
 		formatPrice,
-		getImageUrl
+		getImageUrl,
 	};
 } 

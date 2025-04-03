@@ -10,19 +10,12 @@ export default function ProductCard(props) {
     const { product } = props || {};
     const { addToCart } = useCart();
     const [isAddingToCart, setIsAddingToCart] = useState(false);
-    const [notification, setNotification] = useState({
-        show: false,
-        message: '',
-        type: 'success',
-    });
     const [imageError, setImageError] = useState(false); // Состояние для отслеживания ошибок изображения
 
-    // Функция показа уведомления
-    const showNotification = (message, type = 'success') => {
-        setNotification({ show: true, message, type });
-        setTimeout(() => {
-            setNotification({ show: false, message: '', type: 'success' });
-        }, 3000);
+    // Функция для логирования ошибок добавления в корзину
+    const logError = (message) => {
+        console.error(message);
+        // Здесь можно добавить другую логику без визуального уведомления
     };
 
     // Проверка на null/undefined для product
@@ -130,52 +123,27 @@ export default function ProductCard(props) {
             const result = await addToCart(id);
 
             if (result && result.success) {
-                showNotification(`${name} добавлен в корзину`);
+                // Убрали showNotification при успехе
             } else if (result) {
-                showNotification(
-                    result.message || 'Ошибка добавления в корзину',
-                    'error',
-                );
+                logError(result.message || 'Ошибка добавления в корзину');
             } else {
-                showNotification(
-                    'Неизвестная ошибка при добавлении в корзину',
-                    'error',
-                );
+                logError('Неизвестная ошибка при добавлении в корзину');
             }
         } catch (error) {
             console.error('Ошибка при добавлении в корзину:', error);
-            showNotification('Ошибка добавления в корзину', 'error');
+            logError('Ошибка добавления в корзину');
         } finally {
             setIsAddingToCart(false);
         }
     };
 
     return (
-        <div className="relative">
-            {/* Уведомление о добавлении в корзину */}
-            <div
-                className={`pointer-events-none absolute inset-x-0 top-0 z-50 transition-all duration-300 ${
-                    notification.show
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 -translate-y-6'
-                }`}
-            >
-                <div
-                    className={`mx-auto max-w-[90%] rounded-lg py-2 px-3 text-sm text-white text-center ${
-                        notification.type === 'success'
-                            ? 'bg-green-500'
-                            : 'bg-red-500'
-                    }`}
-                >
-                    {notification.message}
-                </div>
-            </div>
-
+        <div className="relative w-full">
             {/* Карточка товара */}
-            <div className="group h-full overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-md">
+            <div className="group h-[380px] w-full overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-md">
                 <div className="flex h-full flex-col">
                     {/* Часть с изображением */}
-                    <div className="relative h-[180px] sm:h-[200px] md:h-[220px] lg:h-[240px] overflow-hidden bg-gray-100">
+                    <div className="relative h-[200px] w-full overflow-hidden bg-gray-50 rounded-t-xl">
                         {/* Ссылка на страницу товара (покрывает всё изображение) */}
                         <Link
                             href={`/products/${id}`}
@@ -205,7 +173,8 @@ export default function ProductCard(props) {
                                 <img
                                     src={imageUrl}
                                     alt={name}
-                                    className="h-full w-full object-cover object-center transition-all duration-300 group-hover:scale-105"
+                                    className="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
+                                    style={{ mixBlendMode: 'multiply' }}
                                     onError={handleImageError}
                                 />
                             )}
@@ -217,10 +186,10 @@ export default function ProductCard(props) {
                             className="absolute right-2 top-2 z-20 text-xl"
                         />
                     </div>
-                    <div className="relative z-10 flex flex-grow flex-col justify-between p-3 sm:p-4">
-                        <div>
+                    <div className="relative z-10 flex flex-col justify-between p-2 sm:p-3 h-[180px] overflow-hidden">
+                        <div className="flex flex-col flex-shrink-0">
                             {/* Статус наличия */}
-                            <div className="mb-1 sm:mb-1.5">
+                            <div className="mb-1">
                                 <StockStatus
                                     inStock={stock > 0}
                                     quantity={stock}
@@ -229,7 +198,7 @@ export default function ProductCard(props) {
                             </div>
 
                             {/* Название товара */}
-                            <h3 className="mb-1 text-sm sm:text-base lg:text-lg font-medium leading-tight text-gray-800 hover:text-[#8072DB] line-clamp-2">
+                            <h3 className="mb-1 text-sm font-medium leading-tight text-gray-800 hover:text-[#8072DB] line-clamp-2 overflow-hidden">
                                 <Link
                                     href={`/products/${id}`}
                                     className="transition-colors"
@@ -239,9 +208,9 @@ export default function ProductCard(props) {
                             </h3>
                         </div>
 
-                        <div className="mt-auto">
+                        <div className="mt-auto flex-shrink-0">
                             {/* Цена */}
-                            <div className="mt-2 sm:mt-3">
+                            <div className="mt-2">
                                 <ProductPrice 
                                     price={price} 
                                     promotionalPrice={promotionalPrice}
@@ -252,11 +221,11 @@ export default function ProductCard(props) {
                             </div>
 
                             {/* Кнопка Добавить в корзину */}
-                            <div className="mt-3 sm:mt-4">
+                            <div className="mt-3">
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={stock <= 0 || isAddingToCart}
-                                    className={`flex w-full items-center justify-center rounded-lg px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all ${
+                                    className={`flex w-full items-center justify-center rounded-lg px-2 py-2 text-xs font-medium transition-all ${
                                         stock > 0
                                             ? 'bg-size-200 animate-gradient bg-gradient-to-r from-[#B86FBF] via-[#8072DB] to-[#5A8BEA] text-white hover:scale-[1.02] active:scale-[0.98]'
                                             : 'cursor-not-allowed bg-gray-100 text-gray-400'
@@ -264,7 +233,7 @@ export default function ProductCard(props) {
                                 >
                                     {isAddingToCart ? (
                                         <svg
-                                            className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin text-white"
+                                            className="mr-1.5 h-4 w-4 animate-spin text-white"
                                             xmlns="http://www.w3.org/2000/svg"
                                             fill="none"
                                             viewBox="0 0 24 24"
@@ -291,7 +260,7 @@ export default function ProductCard(props) {
                                                 viewBox="0 0 24 24"
                                                 strokeWidth={1.5}
                                                 stroke="currentColor"
-                                                className="mr-1 sm:mr-1.5 h-4 w-4 sm:h-5 sm:w-5"
+                                                className="mr-1 h-4 w-4"
                                             >
                                                 <path
                                                     strokeLinecap="round"

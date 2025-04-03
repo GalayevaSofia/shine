@@ -23,9 +23,6 @@ export default function Payment() {
                         Мы принимаем карты Visa, MasterCard, Мир.
                     </p>
                     <div className="flex items-center gap-3 mt-4">
-                        <img src="/storage/assets/visa.svg" alt="Visa" className="h-8" />
-                        <img src="/storage/assets/mastercard.svg" alt="MasterCard" className="h-8" />
-                        <img src="/storage/assets/mir.svg" alt="Мир" className="h-8" />
                     </div>
                     <InfoAlert type="success">
                         Оплата банковской картой на сайте безопасна и защищена протоколом шифрования данных.
@@ -61,9 +58,6 @@ export default function Payment() {
                         <li>Qiwi Кошелек</li>
                     </ul>
                     <div className="flex items-center gap-3 mt-4">
-                        <img src="/storage/assets/sbp.svg" alt="СБП" className="h-8" />
-                        <img src="/storage/assets/yoomoney.svg" alt="ЮMoney" className="h-8" />
-                        <img src="/storage/assets/qiwi.svg" alt="Qiwi" className="h-8" />
                     </div>
                 </>
             )

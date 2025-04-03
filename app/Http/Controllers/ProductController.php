@@ -23,7 +23,7 @@ class ProductController extends Controller
             $this->applySorting($query, $request);
 
             // Пагинация
-            $perPage = $request->input('per_page', 12);
+            $perPage = $request->input('per_page', 20);
             $products = $query->paginate($perPage);
 
             return response()->json([
@@ -133,7 +133,7 @@ class ProductController extends Controller
             $this->applyFilters($query, $request);
             $this->applySorting($query, $request);
 
-            $products = $query->paginate(12);
+            $products = $query->paginate(20);
 
             return response()->json([
                 'success' => true,
@@ -194,19 +194,34 @@ class ProductController extends Controller
         // Фильтр по производителю
         if ($request->filled('manufacturer')) {
             $manufacturer = $request->manufacturer;
+            Log::info('Применение фильтра по производителю', [
+                'manufacturer_value' => $manufacturer,
+                'manufacturer_type' => gettype($manufacturer)
+            ]);
             
             if (strpos($manufacturer, ',') !== false) {
+                // Если указано несколько производителей через запятую
                 $manufacturers = array_map('trim', explode(',', $manufacturer));
+                Log::info('Несколько производителей', ['manufacturers' => $manufacturers]);
                 
                 $query->where(function($q) use ($manufacturers) {
                     foreach ($manufacturers as $brand) {
                         if (empty($brand)) continue;
                         $q->orWhere('products.manufacturer', 'like', "%{$brand}%");
+                        Log::info('Добавление условия для производителя', ['brand' => $brand]);
                     }
                 });
             } else {
+                // Один производитель - прямой поиск
+                Log::info('Один производитель', ['brand' => $manufacturer]);
                 $query->where('products.manufacturer', 'like', "%{$manufacturer}%");
             }
+            
+            // Выводим SQL-запрос для отладки
+            Log::info('SQL запрос после добавления фильтра по производителю', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings()
+            ]);
         }
 
         // Фильтр по наличию
@@ -232,11 +247,22 @@ class ProductController extends Controller
         // Фильтр по поиску
         if ($request->filled('search')) {
             $search = $request->search;
+            Log::info('Применение фильтра по поиску', [
+                'search_value' => $search,
+                'search_type' => gettype($search)
+            ]);
+            
             $query->where(function ($q) use ($search) {
                 $q->where('products.name', 'like', "%{$search}%")
                     ->orWhere('products.description', 'like', "%{$search}%")
                     ->orWhere('products.manufacturer', 'like', "%{$search}%");
             });
+            
+            // Выводим SQL-запрос для отладки
+            Log::info('SQL запрос после добавления поискового фильтра', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings()
+            ]);
         }
     }
     

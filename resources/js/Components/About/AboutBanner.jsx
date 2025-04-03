@@ -5,9 +5,9 @@ import React from 'react';
  */
 export default function AboutBanner() {
     return (
-        <div className="relative bg-white overflow-hidden">
+        <section className="relative bg-white overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#B86FBF]/5 via-[#8072DB]/5 to-[#5A8BEA]/5"></div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 relative">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24 relative">
                 <div className="text-center">
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
                         О <span className="bg-gradient-to-r from-[#B86FBF] via-[#8072DB] to-[#5A8BEA] bg-clip-text text-transparent animate-gradient bg-size-200">нас</span>
@@ -18,6 +18,6 @@ export default function AboutBanner() {
                     </p>
                 </div>
             </div>
-        </div>
+        </section>
     );
 } 

@@ -11,6 +11,7 @@ import { useCart } from '@/Context/CartContext';
 import { useMediaQuery } from 'react-responsive';
 import ProfileTabs from '@/Components/Profile/ProfileTabs';
 import ProfileForm from '@/Components/Profile/ProfileForm';
+import PasswordForm from '@/Components/Profile/PasswordForm';
 import OrdersList from '@/Components/Profile/OrdersList';
 import WishlistItems from '@/Components/Profile/WishlistItems';
 import Notification from '@/Components/UI/Notification';
@@ -43,20 +44,10 @@ export default function Profile({
                 </h1>
             </div>
 
-            {/* Logout button */}
-            <div className="absolute right-8 top-24">
-                <button
-                    onClick={profile.handleLogout}
-                    className="rounded-full border border-gray-200 px-6 py-2 text-sm text-gray-600 shadow-sm transition-all hover:border-[#8072DB] hover:text-[#8072DB] hover:shadow-md"
-                >
-                    Выйти
-                </button>
-            </div>
-
             {/* Tabs */}
             <ProfileTabs 
                 activeTab={profile.activeTab} 
-                setActiveTab={profile.setActiveTab} 
+                setActiveTab={profile.setActiveTab}
             />
 
             {/* Notification */}
@@ -69,27 +60,40 @@ export default function Profile({
             {/* Tab content */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 {profile.activeTab === 'profile' && (
-                    <ProfileForm 
-                        data={profile.data}
-                        setData={profile.setData}
-                        errors={profile.errors}
-                        processing={profile.processing}
-                        showSuccessMessage={profile.showSuccessMessage}
-                        handleSubmit={profile.handleSubmit}
-                    />
+                    <>
+                        <ProfileForm 
+                            data={profile.data}
+                            setData={profile.setData}
+                            errors={profile.errors}
+                            processing={profile.processing}
+                            showSuccessMessage={profile.showProfileSuccessMessage}
+                            handleSubmit={profile.handleSubmit}
+                        />
+                        
+                        <PasswordForm 
+                            data={profile.data}
+                            setData={profile.setData}
+                            errors={profile.errors}
+                            processing={profile.processing}
+                            showSuccessMessage={profile.showPasswordSuccessMessage}
+                            handlePasswordSubmit={profile.handlePasswordSubmit}
+                        />
+                    </>
                 )}
 
                 {profile.activeTab === 'orders' && (
                     <OrdersList 
                         orders={profile.orders}
                         isLoading={profile.isOrdersLoading}
-                        showSuccessMessage={profile.showSuccessMessage}
+                        showSuccessMessage={profile.showProfileSuccessMessage}
                         flash={profile.flash}
                         formatPrice={profile.formatPrice}
                     />
                 )}
 
                 {profile.activeTab === 'wishlist' && (
+                    <>
+                    {console.log('Rendering wishlist tab with items:', profile.wishlistItems)}
                     <WishlistItems 
                         wishlistItems={profile.wishlistItems}
                         isLoading={profile.isLoading}
@@ -101,7 +105,21 @@ export default function Profile({
                         formatPrice={profile.formatPrice}
                         getImageUrl={profile.getImageUrl}
                     />
+                    </>
                 )}
+            </div>
+
+            {/* Logout Button */}
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-12 text-center">
+                <button
+                    onClick={profile.handleLogout}
+                    className="px-10 py-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-all shadow-sm hover:shadow inline-flex items-center space-x-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Выйти из аккаунта</span>
+                </button>
             </div>
         </MainLayout>
     );

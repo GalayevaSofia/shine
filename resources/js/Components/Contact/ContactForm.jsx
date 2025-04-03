@@ -5,7 +5,7 @@ const GRADIENT_BG = "bg-gradient-to-r from-[#B86FBF] via-[#8072DB] to-[#5A8BEA]"
 const INPUT_STYLE = "w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-[#8072DB]/30 focus:border-[#8072DB] hover:border-[#B86FBF] transition-all";
 
 /**
- * Компонент формы обратной связи
+ * Компонент формы обратной связи с анимированными полями
  */
 export default function ContactForm() {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -44,7 +44,7 @@ export default function ContactForm() {
             
             <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                    <div className="opacity-0 translate-y-8 animate-item-fade-in" style={{ animationDelay: '50ms', animationFillMode: 'forwards' }}>
                         <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1">
                             Ваше имя
                         </label>
@@ -57,7 +57,7 @@ export default function ContactForm() {
                             required
                         />
                     </div>
-                    <div>
+                    <div className="opacity-0 translate-y-8 animate-item-fade-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
                         <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1">
                             Email
                         </label>
@@ -71,7 +71,7 @@ export default function ContactForm() {
                         />
                     </div>
                 </div>
-                <div>
+                <div className="opacity-0 translate-y-8 animate-item-fade-in" style={{ animationDelay: '150ms', animationFillMode: 'forwards' }}>
                     <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1">
                         Сообщение
                     </label>
@@ -84,12 +84,14 @@ export default function ContactForm() {
                         required
                     />
                 </div>
-                <button
-                    type="submit"
-                    className={`w-full ${GRADIENT_BG} text-white py-2 px-4 rounded-lg font-medium text-sm hover:opacity-95 transition-all animate-gradient bg-size-200 shadow-sm transform hover:scale-[1.01] active:scale-[0.99]`}
-                >
-                    Отправить
-                </button>
+                <div className="opacity-0 translate-y-8 animate-item-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                    <button
+                        type="submit"
+                        className={`w-full ${GRADIENT_BG} text-white py-2 px-4 rounded-lg font-medium text-sm hover:opacity-95 transition-all animate-gradient bg-size-200 shadow-sm transform hover:scale-[1.01] active:scale-[0.99]`}
+                    >
+                        Отправить
+                    </button>
+                </div>
             </form>
         </div>
     );

@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Компонент пагинации для каталога
+ * Компонент пагинации для каталога с анимацией
  * 
  * @param {number} currentPage - Текущая страница
  * @param {number} totalProducts - Общее количество товаров
@@ -14,7 +14,7 @@ export default function CatalogPagination({ currentPage, totalProducts, perPage,
     if (totalPages <= 1) return null;
     
     return (
-        <div className="mt-6 sm:mt-8 flex justify-center">
+        <div className="mt-6 sm:mt-8 flex justify-center opacity-0 translate-y-8 animate-item-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <button

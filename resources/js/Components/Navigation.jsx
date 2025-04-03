@@ -90,7 +90,7 @@ export default function Navigation() {
                 ? 'bg-white/90 backdrop-blur-md shadow-lg' 
                 : 'bg-white/75 backdrop-blur-sm'
         } border-b border-gray-100`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <div className="flex-shrink-0 relative group">

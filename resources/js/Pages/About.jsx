@@ -71,14 +71,12 @@ export default function About() {
 
     return (
         <MainLayout>
-            <Head title="О нас">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-            </Head>
+            <Head title="О компании - Shine" />
             
             {/* Верхний баннер */}
             <AboutBanner />
             
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+            <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
                 {/* Статистика */}
                 <StatisticsSection stats={stats} isVisible={animateSection.stats} />
 

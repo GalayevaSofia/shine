@@ -7,7 +7,6 @@ import ProductHeader from '@/Components/Product/ProductHeader';
 import PromotionPrice from '@/Components/UI/PromotionPrice';
 import AddToCartSection from '@/Components/Product/AddToCartSection';
 import ProductTabs from '@/Components/Product/ProductTabs';
-import ProductNotifications from '@/Components/Product/ProductNotifications';
 import useProductDetail from '@/hooks/useProductDetail';
 
 export default function ProductDetail({ product, relatedProducts, error }) {
@@ -26,7 +25,7 @@ export default function ProductDetail({ product, relatedProducts, error }) {
         return (
             <MainLayout>
                 <Head title="Товар не найден - Shine" />
-                <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8">
                     <ErrorState 
                         title="Товар не найден"
                         message={error || 'Товар, который вы ищете, не существует или был удален.'}
@@ -40,15 +39,10 @@ export default function ProductDetail({ product, relatedProducts, error }) {
 
     return (
         <MainLayout>
-            <Head title={product.name || 'Товар не найден'} />
+            <Head title={product.name ? `${product.name} - Shine` : 'Товар - Shine'} />
 
-            <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-[1440px] px-4 pb-16 pt-8 sm:px-6 lg:px-8">
                 <Breadcrumbs items={breadcrumbItems} className="mb-8" />
-
-                <ProductNotifications 
-                    addToCartSuccess={addToCartSuccess} 
-                    addToCartError={addToCartError} 
-                />
 
                 <div className="flex flex-col gap-12 xl:flex-row">
                     {/* Product Image Section */}

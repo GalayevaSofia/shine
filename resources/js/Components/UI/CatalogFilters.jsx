@@ -63,7 +63,7 @@ export default function CatalogFilters({
 
         const value = event.target.value;
         const [sortBy, sortDir] = value.split(':');
-
+        
         onFilterChange({
             ...currentFilters,
             sort_by: sortBy,
@@ -127,56 +127,83 @@ export default function CatalogFilters({
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 {/* Строка поиска */}
                 <div className="mb-3 sm:mb-0 relative flex-1">
-                    <input
-                        type="text"
-                        placeholder="Поиск товаров..."
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-[#8072DB] focus:outline-none"
-                        value={currentFilters?.search || ''}
-                        onChange={(e) =>
-                            handleFilterChange('search', e.target.value)
-                        }
-                    />
-                    <button
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-                        aria-label="Искать"
-                        onClick={() => {
-                            if (currentFilters?.search) {
-                                handleFilterChange('search', '');
-                            }
-                        }}
-                    >
-                        {currentFilters?.search ? (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        ) : (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                />
-                            </svg>
-                        )}
-                    </button>
+                    <form onSubmit={(e) => {
+                        e.preventDefault(); // Предотвращаем отправку формы
+                        // Явно вызываем обработчик с текущим значением поиска
+                        const searchValue = currentFilters?.search || '';
+                        onFilterChange({
+                            ...currentFilters,
+                            search: searchValue
+                        });
+                    }}>
+                        <input
+                            type="text"
+                            placeholder="Поиск товаров..."
+                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 pr-10 text-sm shadow-sm focus:border-[#8072DB] focus:outline-none"
+                            value={currentFilters?.search || ''}
+                            onChange={(e) => {
+                                handleFilterChange('search', e.target.value);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    // Явно вызываем обработчик фильтра при нажатии Enter
+                                    onFilterChange({
+                                        ...currentFilters,
+                                        search: e.target.value
+                                    });
+                                }
+                            }}
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+                            aria-label="Искать"
+                            onClick={() => {
+                                if (currentFilters?.search) {
+                                    handleFilterChange('search', '');
+                                } else {
+                                    // Если поле поиска пустое, запускаем поиск с пустой строкой
+                                    onFilterChange({
+                                        ...currentFilters,
+                                        search: ''
+                                    });
+                                }
+                            }}
+                        >
+                            {currentFilters?.search ? (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            ) : (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                    />
+                                </svg>
+                            )}
+                        </button>
+                    </form>
                 </div>
 
                 {/* Блок с кнопкой фильтров для мобильных и сортировкой */}
@@ -215,7 +242,9 @@ export default function CatalogFilters({
                             value={`${currentFilters?.sort_by || 'popularity'}:${
                                 currentFilters?.sort_dir || 'desc'
                             }`}
-                            onChange={handleSortChange}
+                            onChange={(e) => {
+                                handleSortChange(e);
+                            }}
                         >
                             <option value="popularity:desc">По популярности</option>
                             <option value="price:asc">Сначала дешевле</option>
@@ -223,6 +252,7 @@ export default function CatalogFilters({
                             <option value="name:asc">По алфавиту А-Я</option>
                             <option value="name:desc">По алфавиту Я-А</option>
                             <option value="rating:desc">По рейтингу</option>
+                            <option value="created_at:desc">Сначала новые</option>
                         </select>
                     </div>
                 </div>
@@ -305,18 +335,24 @@ export default function CatalogFilters({
                         <h3 className="mb-2 text-sm font-medium text-gray-700">
                             Производитель
                         </h3>
-                        <input
-                            type="text"
-                            placeholder="Введите названия брендов через запятую"
-                            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#8072DB] focus:outline-none"
-                            value={currentFilters?.manufacturer || ''}
-                            onChange={(e) =>
-                                handleFilterChange(
-                                    'manufacturer',
-                                    e.target.value,
-                                )
-                            }
-                        />
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                        }}>
+                            <input
+                                type="text"
+                                placeholder="Введите названия брендов через запятую"
+                                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#8072DB] focus:outline-none"
+                                value={currentFilters?.manufacturer || ''}
+                                onChange={(e) => {
+                                    handleFilterChange('manufacturer', e.target.value);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                    }
+                                }}
+                            />
+                        </form>
                         <p className="mt-1 text-xs text-gray-500">
                             Например: Shine Beauty, L'Oreal, Maybelline
                         </p>
@@ -489,18 +525,24 @@ export default function CatalogFilters({
                             <h3 className="mb-2 font-medium text-gray-700">
                                 Производитель
                             </h3>
-                            <input
-                                type="text"
-                                placeholder="Введите названия брендов через запятую"
-                                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[#8072DB] focus:outline-none"
-                                value={currentFilters?.manufacturer || ''}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        'manufacturer',
-                                        e.target.value,
-                                    )
-                                }
-                            />
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                            }}>
+                                <input
+                                    type="text"
+                                    placeholder="Введите названия брендов через запятую"
+                                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-[#8072DB] focus:outline-none"
+                                    value={currentFilters?.manufacturer || ''}
+                                    onChange={(e) => {
+                                        handleFilterChange('manufacturer', e.target.value);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                />
+                            </form>
                             <p className="mt-1 text-xs text-gray-500">
                                 Например: Shine Beauty, L'Oreal, Maybelline
                             </p>

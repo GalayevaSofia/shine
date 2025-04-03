@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 
-const PER_PAGE = 12;
+const PER_PAGE = 20;
 
 /**
  * Хук для управления состоянием и логикой каталога товаров
@@ -83,6 +83,18 @@ export default function useCatalog(initialProducts, filters) {
 		// Подготовка параметров для API запроса
 		const apiParams = { ...newFilters };
 
+		// Преобразуем булевые параметры в строки для корректной передачи через URL
+		apiParams.in_stock = apiParams.in_stock === true ? '1' : '0';
+		apiParams.new_products = apiParams.new_products === true ? '1' : '0';
+
+		// Убедимся, что параметры сортировки всегда заданы
+		if (!apiParams.sort_by) {
+			apiParams.sort_by = 'created_at';
+		}
+		if (!apiParams.sort_dir) {
+			apiParams.sort_dir = 'desc';
+		}
+
 		// Преобразуем категорию в число, если это возможно
 		if (apiParams.category && apiParams.category !== '') {
 			const categoryNumber = Number(apiParams.category);
@@ -93,10 +105,17 @@ export default function useCatalog(initialProducts, filters) {
 			}
 		}
 
-		// Удаляем пустые параметры
+		// Убедимся, что параметры правильно передаются
+		if (apiParams.search === undefined) {
+			apiParams.search = '';
+		}
+
+		// Удаляем пустые параметры (кроме search и manufacturer - их оставляем даже пустыми)
 		Object.keys(apiParams).forEach((key) => {
+			// Не удалять параметры search, manufacturer, sort_by, sort_dir и булевые параметры
 			if (
-				apiParams[key] === '' ||
+				(key !== 'search' && key !== 'manufacturer' && key !== 'sort_by' && key !== 'sort_dir' &&
+					key !== 'in_stock' && key !== 'new_products' && apiParams[key] === '') ||
 				apiParams[key] === null ||
 				apiParams[key] === undefined ||
 				Number.isNaN(apiParams[key])
@@ -111,15 +130,17 @@ export default function useCatalog(initialProducts, filters) {
 
 		// Добавляем новые параметры
 		Object.entries(newFilters).forEach(([key, value]) => {
-			// Пропускаем пустые значения и значения по умолчанию
+			// Пропускаем пустые значения и значения по умолчанию, но включаем поиск и manufacturer
 			if (
-				value === '' ||
+				(key !== 'search' && key !== 'manufacturer' && key !== 'in_stock' && key !== 'new_products' && value === '') ||
 				value === null ||
 				value === undefined ||
 				(key === 'sort_by' && value === 'created_at') ||
 				(key === 'sort_dir' && value === 'desc') ||
 				(key === 'page' && value === 1) ||
-				(typeof value === 'boolean' && value === false)
+				// Оставляем булевые параметры только если они true
+				(key === 'in_stock' && value === false) ||
+				(key === 'new_products' && value === false)
 			) {
 				return;
 			}

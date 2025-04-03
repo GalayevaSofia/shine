@@ -7,7 +7,7 @@ export default function Footer() {
             {/* Градиентная линия сверху */}
             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-[#B86FBF] via-[#8072DB] to-[#5A8BEA] animate-gradient bg-size-200"></div>
             
-            <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-[1440px] mx-auto py-16 px-4 sm:px-6 lg:px-8">
                 {/* Верхняя секция с колонками */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
                     <div className="space-y-6">

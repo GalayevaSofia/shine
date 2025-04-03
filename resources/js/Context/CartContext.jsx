@@ -166,6 +166,7 @@ export function CartProvider({ children }) {
                     items: items,
                 });
 
+                // Возвращаем toast на место
                 toast.success('Товар добавлен в корзину');
                 return { success: true, message: 'Товар добавлен в корзину' };
             } else {

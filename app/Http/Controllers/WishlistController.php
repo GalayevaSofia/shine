@@ -7,6 +7,7 @@ use App\Models\Wishlist;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class WishlistController extends Controller
 {
@@ -16,6 +17,12 @@ class WishlistController extends Controller
     public function index(): JsonResponse
     {
         $wishlistItems = Auth::user()->wishlists()->with('product')->get();
+        
+        // Log the structure of the data being returned
+        Log::info('Wishlist items retrieved:', [
+            'count' => $wishlistItems->count(),
+            'sample' => $wishlistItems->first()
+        ]);
         
         return response()->json([
             'success' => true,

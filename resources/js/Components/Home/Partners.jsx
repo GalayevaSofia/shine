@@ -7,7 +7,7 @@ function PartnerLogo({ partner }) {
     return (
         <div 
             key={partner.id}
-            className="w-full max-w-[110px] sm:max-w-[140px] h-14 sm:h-16 flex items-center justify-center bg-white rounded-lg shadow-sm border border-gray-100 p-2 hover:shadow-md hover:border-[#8072DB]/20 transition-all duration-500 group"
+            className="w-full max-w-[110px] sm:max-w-[140px] h-14 sm:h-16 flex items-center justify-center rounded-lg shadow-sm border border-gray-100 p-2 hover:shadow-md hover:border-[#8072DB]/20 transition-all duration-500 group"
         >
             <span className="text-xs sm:text-sm font-medium text-center text-gray-400 filter grayscale group-hover:filter-none group-hover:bg-gradient-to-r group-hover:from-[#B86FBF] group-hover:via-[#8072DB] group-hover:to-[#5A8BEA] group-hover:bg-clip-text group-hover:text-transparent group-hover:animate-gradient group-hover:bg-size-200 transition-all duration-500">
                 {partner.name}
@@ -39,8 +39,8 @@ const partners = [
  */
 export default function Partners() {
     return (
-        <div className="py-8 sm:py-10 lg:py-12 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="py-10 sm:py-12 lg:py-16">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Заголовок секции */}
                 <div className="text-center mb-6 sm:mb-8">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
